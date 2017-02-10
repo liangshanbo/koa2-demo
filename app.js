@@ -1,37 +1,29 @@
-const Koa = require('koa');
+var Koa = require('koa');
+var Router = require('koa-router');
 
-// 注意require('koa-router')返回的是函数:
-// const router = require('koa-router')();
+var app = new Koa();
+var router = new Router();
 
-const app = new Koa();
-
-// log request URL:
-app.use(async (ctx, next) => {
-    console.log(`Process ${ctx.request.method} ${ctx.request.url}...`);
-    await next();
+app.use(async (ctx,next) => {
+	await next();
 });
 
-app.use(async (ctx, next) => {
-    await next();
-    ctx.response.type = 'text/html';
-    ctx.response.body = '<h1>Hello Koa2</h1>';
+router.get('/', function (ctx, next) {
+	this.type = 'text/html';
+	this.body = '<h1>Hello Koa2</h1>';
 });
 
-// add url-route:
-/*router.get('/hello/:name', async (ctx, next) => {
-    var name = ctx.params.name;
-    ctx.response.body = `<h1>Hello, ${name}!</h1>`;
+router.get('/:name', function (ctx, next) {
+	let name = this.params.name;
+	this.type = 'text/html';
+	this.body = `<h1>Hello ${name}</h1>`;
 });
 
-router.get('/', async (ctx, next) => {
-	console.log(ctx);
-    // ctx.response.body = '<h1>Index</h1>';
-});*/
+app
+  .use(router.routes())
+  .use(router.allowedMethods());
 
-// add router middleware:
-// app.use(router.routes());
-
-// 在端口3131监听:
 app.listen(3131);
 
 console.log('app start');
+
